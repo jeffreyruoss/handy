@@ -61,21 +61,21 @@ class PieMenuView(Cocoa.NSView):
     def drawRect_(self, rect):
         """
         Draw the pie menu.
-        
+
         Args:
             rect: The rectangle to draw in
         """
         if not self.menu_items:
             return
-        
+
         # Get the graphics context
         context = Cocoa.NSGraphicsContext.currentContext().CGContext()
-        
+
         # Calculate center point
         bounds = self.bounds()
         center_x = bounds.size.width / 2
         center_y = bounds.size.height / 2
-        
+
         # Number of slices
         num_items = len(self.menu_items)
         angle_per_slice = 2 * math.pi / num_items        # Draw each pie slice
