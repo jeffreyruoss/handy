@@ -148,6 +148,60 @@ class Actions(Cocoa.NSObject):
         print("Executing Paste Without Formatting (Cmd+Option+Shift+V)")
         self.sendKeystrokeWithModifiers_({'key_name': 'v', 'modifiers': ['command', 'shift', 'option']})
 
+    def performDictation_(self, sender):
+        """
+        Perform Dictation by directly starting dictation.
+        """
+        print("Executing Dictation")
+        if self.previous_app:
+            app_name = self.previous_app.localizedName()
+            print(f"Reactivating: {app_name}")
+            self.previous_app.activateWithOptions_(Cocoa.NSApplicationActivateIgnoringOtherApps)
+        
+        # Use AppleScript to start dictation directly
+        script = '''
+        delay 0.25
+        tell application "System Events"
+            tell (first application process whose frontmost is true)
+                click menu item "Start Dictation" of menu "Edit" of menu bar 1
+            end tell
+        end tell
+        '''
+        try:
+            result = subprocess.run(
+                ['osascript', '-e', script],
+                capture_output=True,
+                text=True,
+                timeout=2
+            )
+            if result.returncode == 0:
+                print("Dictation started successfully")
+            else:
+                print(f"AppleScript error: {result.stderr.strip()}")
+                # Fallback: try using the keyboard shortcut fn+fn
+                print("Trying alternate method with fn key...")
+                script2 = '''
+                tell application "System Events"
+                    key code 63
+                    delay 0.1
+                    key code 63
+                end tell
+                '''
+                result2 = subprocess.run(
+                    ['osascript', '-e', script2],
+                    capture_output=True,
+                    text=True,
+                    timeout=2
+                )
+                if result2.returncode == 0:
+                    print("Dictation triggered with fn key")
+                else:
+                    print(f"Fn key method also failed: {result2.stderr.strip()}")
+        except subprocess.TimeoutExpired:
+            print("Dictation trigger timed out")
+        except Exception as e:
+            print(f"Error triggering dictation: {e}")
+
     def sendKeystrokeWithModifiers_(self, args):
         """
         Send a keystroke with specified modifiers using AppleScript.

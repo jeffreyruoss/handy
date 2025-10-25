@@ -90,6 +90,14 @@ class MenuUI(Cocoa.NSObject):
         paste_plain_item.setEnabled_(True)
         menu.addItem_(paste_plain_item)
 
+        # Add Dictation menu item
+        dictation_item = Cocoa.NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
+            "Dictation (Control x2)", "performDictation:", ""
+        )
+        dictation_item.setTarget_(self.actions)
+        dictation_item.setEnabled_(True)
+        menu.addItem_(dictation_item)
+
         # Add separator
         menu.addItem_(Cocoa.NSMenuItem.separatorItem())
 
