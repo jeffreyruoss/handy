@@ -3,7 +3,7 @@ Hotkey Listener Module
 Handles global keyboard shortcut detection.
 """
 
-from pynput import keyboard
+from pynput import keyboard, mouse
 
 
 class HotkeyListener:
@@ -18,8 +18,8 @@ class HotkeyListener:
         """
         self.menu_ui = menu_ui
         self.listener = None
-        # Using Cmd+Shift+Space as the hotkey
         self.current_keys = set()
+        self.mouse_controller = mouse.Controller()
 
     def on_press(self, key):
         """
@@ -36,9 +36,7 @@ class HotkeyListener:
             keyboard.Key.space in self.current_keys):
 
             # Get current mouse position
-            from pynput import mouse
-            controller = mouse.Controller()
-            x, y = controller.position
+            x, y = self.mouse_controller.position
 
             print(f"Hotkey pressed at ({x}, {y})")
             self.menu_ui.show_menu(x, y)

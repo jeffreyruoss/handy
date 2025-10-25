@@ -5,12 +5,10 @@ Handles the popup menu display and interaction.
 
 import objc
 import Cocoa
-from Foundation import NSObject
-from PyObjCTools import AppHelper
 from actions import Actions
 
 
-class MenuUI(NSObject):
+class MenuUI(Cocoa.NSObject):
     """Creates and displays a popup menu at cursor position."""
 
     def init(self):
