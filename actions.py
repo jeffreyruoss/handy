@@ -103,3 +103,70 @@ class Actions(Cocoa.NSObject):
         print("Quitting Handy App...")
         AppHelper.stopEventLoop()
         sys.exit(0)
+
+    def performSelectAll_(self, sender):
+        """
+        Perform select all action (Cmd+A).
+        """
+        print("Executing Select All (Cmd+A)")
+        self.sendKeystrokeWithModifiers_({'key_name': 'a', 'modifiers': ['command']})
+
+    def performSelectAllCopy_(self, sender):
+        """
+        Perform select all and copy action (Cmd+A then Cmd+C).
+        """
+        print("Executing Select All & Copy (Cmd+A then Cmd+C)")
+        self.sendKeystrokeWithModifiers_({'key_name': 'a', 'modifiers': ['command']})
+        # Small delay between commands
+        import time
+        time.sleep(0.15)
+        self.sendKeystrokeWithModifiers_({'key_name': 'c', 'modifiers': ['command']})
+
+    def performPastebot_(self, sender):
+        """
+        Perform Pastebot action (Cmd+Shift+V).
+        """
+        print("Executing Pastebot (Cmd+Shift+V)")
+        self.sendKeystrokeWithModifiers_({'key_name': 'v', 'modifiers': ['command', 'shift']})
+
+    def performPastePlain_(self, sender):
+        """
+        Perform Paste Without Formatting (Cmd+Option+Shift+V).
+        """
+        print("Executing Paste Without Formatting (Cmd+Option+Shift+V)")
+        self.sendKeystrokeWithModifiers_({'key_name': 'v', 'modifiers': ['command', 'shift', 'option']})
+
+    def sendKeystrokeWithModifiers_(self, args):
+        """
+        Send a keystroke with specified modifiers using AppleScript.
+        """
+        if self.previous_app:
+            app_name = self.previous_app.localizedName()
+            print(f"Reactivating: {app_name}")
+            self.previous_app.activateWithOptions_(Cocoa.NSApplicationActivateIgnoringOtherApps)
+
+        # Build AppleScript modifiers string
+        key_name = args['key_name']
+        modifiers = args['modifiers']
+        mod_str = ' using ' + ' & '.join([f'{mod} down' for mod in modifiers]) if modifiers else ''
+        script = f'''
+        delay 0.25
+        tell application "System Events"
+            keystroke "{key_name}"{mod_str}
+        end tell
+        '''
+        try:
+            result = subprocess.run(
+                ['osascript', '-e', script],
+                capture_output=True,
+                text=True,
+                timeout=2
+            )
+            if result.returncode == 0:
+                print(f"Keystroke '{key_name}' with {modifiers} sent successfully")
+            else:
+                print(f"AppleScript error: {result.stderr.strip()}")
+        except subprocess.TimeoutExpired:
+            print("Keystroke timed out")
+        except Exception as e:
+            print(f"Error sending keystroke: {e}")

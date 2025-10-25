@@ -58,6 +58,38 @@ class MenuUI(Cocoa.NSObject):
         paste_item.setEnabled_(True)
         menu.addItem_(paste_item)
 
+        # Add Select All menu item
+        select_all_item = Cocoa.NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
+            "Select All", "performSelectAll:", ""
+        )
+        select_all_item.setTarget_(self.actions)
+        select_all_item.setEnabled_(True)
+        menu.addItem_(select_all_item)
+
+        # Add Select All & Copy menu item
+        select_all_copy_item = Cocoa.NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
+            "Select All & Copy", "performSelectAllCopy:", ""
+        )
+        select_all_copy_item.setTarget_(self.actions)
+        select_all_copy_item.setEnabled_(True)
+        menu.addItem_(select_all_copy_item)
+
+        # Add Pastebot menu item
+        pastebot_item = Cocoa.NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
+            "Pastebot (Cmd+Shift+V)", "performPastebot:", ""
+        )
+        pastebot_item.setTarget_(self.actions)
+        pastebot_item.setEnabled_(True)
+        menu.addItem_(pastebot_item)
+
+        # Add Paste Without Formatting menu item
+        paste_plain_item = Cocoa.NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
+            "Paste Without Formatting", "performPastePlain:", ""
+        )
+        paste_plain_item.setTarget_(self.actions)
+        paste_plain_item.setEnabled_(True)
+        menu.addItem_(paste_plain_item)
+
         # Add separator
         menu.addItem_(Cocoa.NSMenuItem.separatorItem())
 
