@@ -13,6 +13,9 @@ from PyObjCTools import AppHelper
 class Actions(Cocoa.NSObject):
     """Handles menu actions using PyObjC."""
 
+    # Delay in seconds before sending keystrokes (adjust this value to tune responsiveness)
+    KEYSTROKE_DELAY = 0.01
+
     def init(self):
         """Initialize the actions handler."""
         self = objc.super(Actions, self).init()
@@ -41,7 +44,7 @@ class Actions(Cocoa.NSObject):
         # Use AppleScript with proper error handling
         # The delay helps ensure the app is reactivated
         script = f'''
-        delay 0.2
+        delay {self.KEYSTROKE_DELAY}
         tell application "System Events"
             keystroke "{key_name}" using command down
         end tell
@@ -159,8 +162,8 @@ class Actions(Cocoa.NSObject):
             self.previous_app.activateWithOptions_(Cocoa.NSApplicationActivateIgnoringOtherApps)
 
         # Use AppleScript to start dictation directly
-        script = '''
-        delay 0.25
+        script = f'''
+        delay {self.KEYSTROKE_DELAY}
         tell application "System Events"
             tell (first application process whose frontmost is true)
                 click menu item "Start Dictation" of menu "Edit" of menu bar 1
@@ -216,7 +219,7 @@ class Actions(Cocoa.NSObject):
         modifiers = args['modifiers']
         mod_str = ' using ' + ' & '.join([f'{mod} down' for mod in modifiers]) if modifiers else ''
         script = f'''
-        delay 0.25
+        delay {self.KEYSTROKE_DELAY}
         tell application "System Events"
             keystroke "{key_name}"{mod_str}
         end tell
