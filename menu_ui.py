@@ -126,3 +126,31 @@ class MenuUI(Cocoa.NSObject):
             location_dict,
             False
         )
+
+    def close_menu(self):
+        """
+        Close the menu if it's currently visible.
+        This can be called from any thread; it will execute on the main thread.
+        """
+        self.performSelectorOnMainThread_withObject_waitUntilDone_(
+            "closeMenuOnMainThread:",
+            None,
+            False
+        )
+
+    def closeMenuOnMainThread_(self, _):
+        """
+        Close the menu window on the main thread.
+        """
+        if self.menu_window and self.menu_window.isVisible():
+            self.menu_window.orderOut_(None)
+            self.menu_window = None
+
+    def is_menu_visible(self):
+        """
+        Check if the menu is currently visible.
+
+        Returns:
+            True if menu is visible, False otherwise
+        """
+        return self.menu_window is not None and self.menu_window.isVisible()

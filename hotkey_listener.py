@@ -31,8 +31,13 @@ class HotkeyListener:
         """
         # Check for middle button (mouse wheel) press
         if button == mouse.Button.middle and pressed:
-            print(f"Mouse wheel clicked at ({x}, {y})")
-            self.menu_ui.show_menu(x, y)
+            # Toggle menu: close if open, show if closed
+            if self.menu_ui.is_menu_visible():
+                print("Mouse wheel clicked - closing menu")
+                self.menu_ui.close_menu()
+            else:
+                print(f"Mouse wheel clicked at ({x}, {y})")
+                self.menu_ui.show_menu(x, y)
 
     def start(self):
         """Start listening for mouse events."""
