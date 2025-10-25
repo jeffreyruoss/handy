@@ -93,6 +93,18 @@ class Actions(Cocoa.NSObject):
         print("Executing Paste (Cmd+V)")
         self.sendKeystroke_('v')
 
+    def performRestart_(self, sender):
+        """
+        Restart the application.
+
+        Args:
+            sender: The menu item that triggered this action
+        """
+        print("Restarting Handy App...")
+        import os
+        python = sys.executable
+        os.execl(python, python, *sys.argv)
+
     def performQuit_(self, sender):
         """
         Quit the application.

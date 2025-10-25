@@ -93,6 +93,14 @@ class MenuUI(Cocoa.NSObject):
         # Add separator
         menu.addItem_(Cocoa.NSMenuItem.separatorItem())
 
+        # Add Restart menu item
+        restart_item = Cocoa.NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
+            "Restart Handy App", "performRestart:", ""
+        )
+        restart_item.setTarget_(self.actions)
+        restart_item.setEnabled_(True)
+        menu.addItem_(restart_item)
+
         # Add Quit menu item
         quit_item = Cocoa.NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
             "Quit Handy App", "performQuit:", ""
