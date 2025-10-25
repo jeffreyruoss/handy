@@ -53,11 +53,15 @@ class MenuUI(Cocoa.NSObject):
             {'title': 'Pastebot', 'action': 'performPastebot:', 'target': self.actions},
             {'title': 'Paste Plain', 'action': 'performPastePlain:', 'target': self.actions},
             {'title': 'Dictation', 'action': 'performDictation:', 'target': self.actions},
+            {'title': 'Dia', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Dia.app'},
+            {'title': 'VS Code', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Visual Studio Code - Insiders.app'},
+            {'title': 'Notion', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Notion.app'},
             {'title': 'Restart', 'action': 'performRestart:', 'target': self.actions},
         ]
 
         # Create window size (radius * 2 + padding)
-        menu_size = 260
+        # Increased size to accommodate more menu items
+        menu_size = 340
 
         # Get screen height for coordinate conversion
         # macOS screen coords: origin at bottom-left, y increases upward

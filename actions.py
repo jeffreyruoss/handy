@@ -76,6 +76,38 @@ class Actions(Cocoa.NSObject):
         except Exception as e:
             print(f"Error sending keystroke: {e}")
 
+    def activateApp_(self, app_path_obj):
+        """
+        Activate (bring to front) the specified application.
+
+        Args:
+            app_path_obj: Dictionary with 'path' key containing app path
+        """
+        app_path = app_path_obj['path'] if isinstance(app_path_obj, dict) else app_path_obj
+
+        workspace = Cocoa.NSWorkspace.sharedWorkspace()
+
+        # Try to find the running app by bundle identifier or path
+        bundle_url = Cocoa.NSURL.fileURLWithPath_(app_path)
+        bundle = Cocoa.NSBundle.bundleWithURL_(bundle_url)
+
+        if bundle:
+            bundle_id = bundle.bundleIdentifier()
+            running_apps = workspace.runningApplications()
+
+            # Look for the app in running applications
+            for app in running_apps:
+                if app.bundleIdentifier() == bundle_id:
+                    print(f"Activating {app.localizedName()}")
+                    app.activateWithOptions_(Cocoa.NSApplicationActivateIgnoringOtherApps)
+                    return
+
+            # App not running, launch it
+            print(f"Launching {app_path}")
+            workspace.openURL_(bundle_url)
+        else:
+            print(f"Could not find bundle for {app_path}")
+
     def performCopy_(self, sender):
         """
         Perform copy action (Cmd+C).

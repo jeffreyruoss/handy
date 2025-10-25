@@ -19,8 +19,8 @@ class PieMenuView(Cocoa.NSView):
 
         self.menu_items = []
         self.hovered_index = -1
-        self.radius = 120
-        self.center_radius = 30
+        self.radius = 160
+        self.center_radius = 35
 
         # Set up tracking area for mouse hover
         self.tracking_area = None
@@ -164,8 +164,13 @@ class PieMenuView(Cocoa.NSView):
             # Call the action
             if target and action:
                 try:
-                    # PyObjC automatically handles selector conversion
-                    target.performSelector_withObject_(action, None)
+                    # Check if this action needs an app_path parameter
+                    if 'app_path' in item:
+                        # Pass app path as a dictionary
+                        target.performSelector_withObject_(action, {'path': item['app_path']})
+                    else:
+                        # PyObjC automatically handles selector conversion
+                        target.performSelector_withObject_(action, None)
                 except Exception as e:
                     print(f"Error calling action {action}: {e}")
 
