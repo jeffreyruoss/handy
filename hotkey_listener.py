@@ -1,13 +1,13 @@
 """
 Hotkey Listener Module
-Handles global keyboard shortcut detection.
+Handles global mouse button detection.
 """
 
-from pynput import keyboard, mouse
+from pynput import mouse
 
 
 class HotkeyListener:
-    """Listens for keyboard shortcut presses globally."""
+    """Listens for mouse wheel button presses globally."""
 
     def __init__(self, menu_ui):
         """
@@ -18,49 +18,27 @@ class HotkeyListener:
         """
         self.menu_ui = menu_ui
         self.listener = None
-        self.current_keys = set()
-        self.mouse_controller = mouse.Controller()
 
-    def on_press(self, key):
+    def on_click(self, x, y, button, pressed):
         """
-        Callback for key press events.
+        Callback for mouse click events.
 
         Args:
-            key: Key that was pressed
+            x: Mouse x coordinate
+            y: Mouse y coordinate
+            button: Mouse button that was clicked
+            pressed: True if pressed, False if released
         """
-        self.current_keys.add(key)
-
-        # Check for Cmd+Shift+Space
-        if (keyboard.Key.cmd in self.current_keys and
-            keyboard.Key.shift in self.current_keys and
-            keyboard.Key.space in self.current_keys):
-
-            # Get current mouse position
-            x, y = self.mouse_controller.position
-
-            print(f"Hotkey pressed at ({x}, {y})")
+        # Check for middle button (mouse wheel) press
+        if button == mouse.Button.middle and pressed:
+            print(f"Mouse wheel clicked at ({x}, {y})")
             self.menu_ui.show_menu(x, y)
 
-    def on_release(self, key):
-        """
-        Callback for key release events.
-
-        Args:
-            key: Key that was released
-        """
-        try:
-            self.current_keys.remove(key)
-        except KeyError:
-            pass
-
     def start(self):
-        """Start listening for keyboard events."""
-        self.listener = keyboard.Listener(
-            on_press=self.on_press,
-            on_release=self.on_release
-        )
+        """Start listening for mouse events."""
+        self.listener = mouse.Listener(on_click=self.on_click)
         self.listener.start()
-        print("Listening for Cmd+Shift+Space hotkey...")
+        print("Listening for mouse wheel button press...")
 
     def join(self):
         """Wait for the listener thread to finish."""
@@ -68,6 +46,6 @@ class HotkeyListener:
             self.listener.join()
 
     def stop(self):
-        """Stop listening for keyboard events."""
+        """Stop listening for mouse events."""
         if self.listener:
             self.listener.stop()

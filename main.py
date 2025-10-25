@@ -28,7 +28,7 @@ class AppDelegate(Cocoa.NSObject):
     def applicationDidFinishLaunching_(self, notification):
         """Called when the application finishes launching."""
         print("Starting Handy App...")
-        print("Press Cmd+Shift+Space to open the quick menu.")
+        print("Press the mouse wheel button to open the quick menu.")
         print("Press Ctrl+C in terminal to quit.\n")
 
         # Create menu UI instance (on main thread)
