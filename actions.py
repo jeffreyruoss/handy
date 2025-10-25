@@ -157,7 +157,7 @@ class Actions(Cocoa.NSObject):
             app_name = self.previous_app.localizedName()
             print(f"Reactivating: {app_name}")
             self.previous_app.activateWithOptions_(Cocoa.NSApplicationActivateIgnoringOtherApps)
-        
+
         # Use AppleScript to start dictation directly
         script = '''
         delay 0.25
