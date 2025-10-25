@@ -44,24 +44,28 @@ class MenuUI(Cocoa.NSObject):
         if active_app:
             self.actions.setPreviousApp_(active_app)
 
-        # Define menu items
+        # Define menu items for pie menu (frequently used)
         menu_items = [
             {'title': 'Copy', 'action': 'performCopy:', 'target': self.actions},
             {'title': 'Paste', 'action': 'performPaste:', 'target': self.actions},
-            {'title': 'Select All', 'action': 'performSelectAll:', 'target': self.actions},
-            {'title': 'Select All & Copy', 'action': 'performSelectAllCopy:', 'target': self.actions},
             {'title': 'Pastebot', 'action': 'performPastebot:', 'target': self.actions},
             {'title': 'Paste Plain', 'action': 'performPastePlain:', 'target': self.actions},
             {'title': 'Dictation', 'action': 'performDictation:', 'target': self.actions},
             {'title': 'Dia', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Dia.app'},
             {'title': 'VS Code', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Visual Studio Code - Insiders.app'},
             {'title': 'Notion', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Notion.app'},
-            {'title': 'Restart', 'action': 'performRestart:', 'target': self.actions},
+        ]
+
+        # Define secondary menu items (less frequently used)
+        secondary_items = [
+            {'title': 'Select All', 'action': 'performSelectAll:', 'target': self.actions},
+            {'title': 'Select All & Copy', 'action': 'performSelectAllCopy:', 'target': self.actions},
+            {'title': 'Restart Handy', 'action': 'performRestart:', 'target': self.actions},
         ]
 
         # Create window size (radius * 2 + padding)
-        # Increased size to accommodate more menu items
         menu_size = 340
+        secondary_menu_height = 40
 
         # Get screen height for coordinate conversion
         # macOS screen coords: origin at bottom-left, y increases upward
@@ -72,17 +76,16 @@ class MenuUI(Cocoa.NSObject):
 
         # Convert from screen coordinates (bottom-left origin) to window position (top-left origin)
         # Center the menu on the cursor position
+        total_height = menu_size + secondary_menu_height + 10
         window_x = x - menu_size / 2
         window_y = screen_height - y - menu_size / 2
 
         window_rect = Cocoa.NSMakeRect(
             window_x,
-            window_y,
+            window_y - secondary_menu_height - 10,  # Shift up to account for secondary menu
             menu_size,
-            menu_size
-        )
-
-        # Create a borderless, transparent window
+            total_height
+        )        # Create a borderless, transparent window
         style_mask = Cocoa.NSWindowStyleMaskBorderless
         self.menu_window = Cocoa.NSWindow.alloc().initWithContentRect_styleMask_backing_defer_(
             window_rect,
@@ -104,8 +107,27 @@ class MenuUI(Cocoa.NSObject):
         )
         pie_view.setMenuItems_(menu_items)
 
-        # Set view as window content
-        self.menu_window.setContentView_(pie_view)
+        # Create container view that holds both pie menu and secondary menu
+        from secondary_menu_view import SecondaryMenuView
+
+        total_height = menu_size + secondary_menu_height + 10  # 10px gap
+        container_view = Cocoa.NSView.alloc().initWithFrame_(
+            Cocoa.NSMakeRect(0, 0, menu_size, total_height)
+        )
+
+        # Position pie menu at the top of container
+        pie_view.setFrameOrigin_(Cocoa.NSMakePoint(0, secondary_menu_height + 10))
+        container_view.addSubview_(pie_view)
+
+        # Create and position secondary menu at the bottom
+        secondary_view = SecondaryMenuView.alloc().initWithFrame_(
+            Cocoa.NSMakeRect(0, 0, menu_size, secondary_menu_height)
+        )
+        secondary_view.setMenuItems_(secondary_items)
+        container_view.addSubview_(secondary_view)
+
+        # Set container as window content
+        self.menu_window.setContentView_(container_view)
 
         # Show the window
         self.menu_window.makeKeyAndOrderFront_(None)
