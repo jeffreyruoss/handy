@@ -183,6 +183,20 @@ class Actions(Cocoa.NSObject):
         print("Executing Paste Without Formatting (Cmd+Option+Shift+V)")
         self.sendKeystrokeWithModifiers_({'key_name': 'v', 'modifiers': ['command', 'shift', 'option']})
 
+    def performScreenCapture_(self, sender):
+        """
+        Perform Screen Capture using native macOS screencapture command.
+        """
+        print("Executing Screen Capture")
+        try:
+            # Use the native screencapture command with interactive mode
+            # -i = interactive mode (click and drag to select area)
+            # -c = copy to clipboard instead of saving to file
+            subprocess.Popen(['screencapture', '-i', '-c'])
+            print("Screenshot tool launched")
+        except Exception as e:
+            print(f"Error launching screenshot: {e}")
+
     def performDictation_(self, sender):
         """
         Perform Dictation by directly starting dictation.

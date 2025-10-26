@@ -60,6 +60,7 @@ class MenuUI(Cocoa.NSObject):
         secondary_items = [
             {'title': 'Select All', 'action': 'performSelectAll:', 'target': self.actions},
             {'title': 'Select All & Copy', 'action': 'performSelectAllCopy:', 'target': self.actions},
+            {'title': 'Screenshot', 'action': 'performScreenCapture:', 'target': self.actions},
             {'title': 'Restart Handy', 'action': 'performRestart:', 'target': self.actions},
         ]
 
