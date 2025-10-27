@@ -19,8 +19,9 @@ class PieMenuView(Cocoa.NSView):
 
         self.menu_items = []
         self.hovered_index = -1
-        self.radius = 160
+        self.radius = 200  # Increased from 160 to accommodate icons
         self.center_radius = 35
+        self.icon_cache = {}  # Cache loaded icons
 
         # Set up tracking area for mouse hover
         self.tracking_area = None
@@ -108,11 +109,46 @@ class PieMenuView(Cocoa.NSView):
             path.setLineWidth_(1.5)
             path.stroke()
 
-            # Draw text label
+            # Calculate position for icon and text
             mid_angle = start_angle + angle_per_slice / 2
-            text_radius = self.radius * 0.65
-            text_x = center_x + text_radius * math.cos(mid_angle)
-            text_y = center_y + text_radius * math.sin(mid_angle)
+            content_radius = self.radius * 0.65
+            content_x = center_x + content_radius * math.cos(mid_angle)
+            content_y = center_y + content_radius * math.sin(mid_angle)
+
+            # Draw icon if available
+            icon_size = 40
+            if 'icon' in item and item['icon']:
+                icon = self.loadIcon_(item['icon'])
+                if icon:
+                    icon_rect = Cocoa.NSMakeRect(
+                        content_x - icon_size / 2,
+                        content_y - icon_size / 2 + 15,  # Offset up from center
+                        icon_size,
+                        icon_size
+                    )
+
+                    # Save graphics state
+                    Cocoa.NSGraphicsContext.currentContext().saveGraphicsState()
+
+                    # Create rounded rectangle clipping path for icon
+                    icon_corner_radius = 8  # Adjust this value for more/less rounding
+                    icon_clip_path = Cocoa.NSBezierPath.bezierPathWithRoundedRect_xRadius_yRadius_(
+                        icon_rect,
+                        icon_corner_radius,
+                        icon_corner_radius
+                    )
+                    icon_clip_path.addClip()
+
+                    # Draw the icon within the rounded rectangle
+                    icon.drawInRect_fromRect_operation_fraction_(
+                        icon_rect,
+                        Cocoa.NSZeroRect,
+                        Cocoa.NSCompositeSourceOver,
+                        1.0
+                    )
+
+                    # Restore graphics state
+                    Cocoa.NSGraphicsContext.currentContext().restoreGraphicsState()
 
             # Create text attributes
             attributes = {
@@ -120,12 +156,13 @@ class PieMenuView(Cocoa.NSView):
                 Cocoa.NSForegroundColorAttributeName: Cocoa.NSColor.whiteColor()
             }
 
-            # Draw the title
+            # Draw the title below the icon
             title = Cocoa.NSString.stringWithString_(item['title'])
             text_size = title.sizeWithAttributes_(attributes)
+            text_y_offset = -20 if 'icon' in item and item['icon'] else 0
             text_rect = Cocoa.NSMakeRect(
-                text_x - text_size.width / 2,
-                text_y - text_size.height / 2,
+                content_x - text_size.width / 2,
+                content_y - text_size.height / 2 + text_y_offset,
                 text_size.width,
                 text_size.height
             )
@@ -220,3 +257,30 @@ class PieMenuView(Cocoa.NSView):
         index = int(angle / angle_per_slice)
 
         return index if index < num_items else -1
+
+    def loadIcon_(self, icon_path):
+        """
+        Load an icon from the specified path and cache it.
+
+        Args:
+            icon_path: Path to the icon file (PNG, JPEG, WebP)
+
+        Returns:
+            NSImage object or None if loading fails
+        """
+        # Check cache first
+        if icon_path in self.icon_cache:
+            return self.icon_cache[icon_path]
+
+        # Try to load the icon
+        try:
+            icon = Cocoa.NSImage.alloc().initWithContentsOfFile_(icon_path)
+            if icon:
+                # Resize to 40x40 if needed
+                icon.setSize_(Cocoa.NSMakeSize(40, 40))
+                self.icon_cache[icon_path] = icon
+                return icon
+        except Exception as e:
+            print(f"Error loading icon {icon_path}: {e}")
+
+        return None

@@ -7,6 +7,7 @@ import objc
 import Cocoa
 from actions import Actions
 from pie_menu_view import PieMenuView
+from icon_helper import icon_path
 
 
 class MenuUI(Cocoa.NSObject):
@@ -45,15 +46,17 @@ class MenuUI(Cocoa.NSObject):
             self.actions.setPreviousApp_(active_app)
 
         # Define menu items for pie menu (frequently used)
+        # Icons are loaded from the icons/ directory
+        # Add PNG files to icons/ and they'll be automatically found
         menu_items = [
-            {'title': 'Copy', 'action': 'performCopy:', 'target': self.actions},
-            {'title': 'Paste', 'action': 'performPaste:', 'target': self.actions},
-            {'title': 'Pastebot', 'action': 'performPastebot:', 'target': self.actions},
-            {'title': 'Paste Plain', 'action': 'performPastePlain:', 'target': self.actions},
-            {'title': 'Dictation', 'action': 'performDictation:', 'target': self.actions},
-            {'title': 'Dia', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Dia.app'},
-            {'title': 'VS Code', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Visual Studio Code - Insiders.app'},
-            {'title': 'Notion', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Notion.app'},
+            {'title': 'Copy', 'action': 'performCopy:', 'target': self.actions, 'icon': icon_path('copy.png')},
+            {'title': 'Paste', 'action': 'performPaste:', 'target': self.actions, 'icon': icon_path('paste.png')},
+            {'title': 'Pastebot', 'action': 'performPastebot:', 'target': self.actions, 'icon': icon_path('pastebot.png')},
+            {'title': 'Paste Plain', 'action': 'performPastePlain:', 'target': self.actions, 'icon': icon_path('paste-plain.png')},
+            {'title': 'Dictation', 'action': 'performDictation:', 'target': self.actions, 'icon': icon_path('dictation.png')},
+            {'title': 'Dia', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Dia.app', 'icon': icon_path('dia.png')},
+            {'title': 'VS Code', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Visual Studio Code - Insiders.app', 'icon': icon_path('vscode.png')},
+            {'title': 'Notion', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Notion.app', 'icon': icon_path('notion.png')},
         ]
 
         # Define secondary menu items (less frequently used)
@@ -65,7 +68,7 @@ class MenuUI(Cocoa.NSObject):
         ]
 
         # Create window size (radius * 2 + padding)
-        menu_size = 340
+        menu_size = 420  # Increased from 340 to accommodate larger pie menu
         secondary_menu_height = 40
 
         # Get screen height for coordinate conversion
