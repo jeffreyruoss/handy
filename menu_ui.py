@@ -48,15 +48,16 @@ class MenuUI(Cocoa.NSObject):
         # Define menu items for pie menu (frequently used)
         # Icons are loaded from the icons/ directory
         # Add PNG files to icons/ and they'll be automatically found
+        # Pie starts at top and goes clockwise
         menu_items = [
-            {'title': 'Copy', 'action': 'performCopy:', 'target': self.actions, 'icon': icon_path('copy.png')},
-            {'title': 'Paste', 'action': 'performPaste:', 'target': self.actions, 'icon': icon_path('paste.png')},
-            {'title': 'Pastebot', 'action': 'performPastebot:', 'target': self.actions, 'icon': icon_path('pastebot.png')},
-            {'title': 'Paste Plain', 'action': 'performPastePlain:', 'target': self.actions, 'icon': icon_path('paste-plain.png')},
             {'title': 'Dictation', 'action': 'performDictation:', 'target': self.actions, 'icon': icon_path('dictation.png')},
-            {'title': 'Dia', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Dia.app', 'icon': icon_path('dia.png')},
-            {'title': 'VS Code', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Visual Studio Code - Insiders.app', 'icon': icon_path('vscode.png')},
+            {'title': 'Paste Plain', 'action': 'performPastePlain:', 'target': self.actions, 'icon': icon_path('paste-plain.png')},
+            {'title': 'Pastebot', 'action': 'performPastebot:', 'target': self.actions, 'icon': icon_path('pastebot.png')},
+            {'title': 'Paste', 'action': 'performPaste:', 'target': self.actions, 'icon': icon_path('paste.png')},
+            {'title': 'Copy', 'action': 'performCopy:', 'target': self.actions, 'icon': icon_path('copy.png')},
             {'title': 'Notion', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Notion.app', 'icon': icon_path('notion.png')},
+            {'title': 'VS Code', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Visual Studio Code - Insiders.app', 'icon': icon_path('vscode.png')},
+            {'title': 'Dia', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Dia.app', 'icon': icon_path('dia.png')},
         ]
 
         # Define secondary menu items (less frequently used)
