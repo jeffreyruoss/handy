@@ -183,6 +183,39 @@ class PieMenuView(Cocoa.NSView):
         center_path.setLineWidth_(1.5)
         center_path.stroke()
 
+        # Draw handy logo in center
+        from icon_helper import icon_path
+        handy_icon_path = icon_path('handy.png')
+        if handy_icon_path:
+            handy_icon = self.loadIcon_(handy_icon_path)
+            if handy_icon:
+                # Make icon fill the center circle
+                center_icon_size = self.center_radius * 1.9
+                center_icon_rect = Cocoa.NSMakeRect(
+                    center_x - center_icon_size / 2,
+                    center_y - center_icon_size / 2,
+                    center_icon_size,
+                    center_icon_size
+                )
+
+                # Save graphics state
+                Cocoa.NSGraphicsContext.currentContext().saveGraphicsState()
+
+                # Clip to circle for rounded icon
+                center_clip_path = Cocoa.NSBezierPath.bezierPathWithOvalInRect_(center_icon_rect)
+                center_clip_path.addClip()
+
+                # Draw the icon
+                handy_icon.drawInRect_fromRect_operation_fraction_(
+                    center_icon_rect,
+                    Cocoa.NSZeroRect,
+                    Cocoa.NSCompositeSourceOver,
+                    1.0
+                )
+
+                # Restore graphics state
+                Cocoa.NSGraphicsContext.currentContext().restoreGraphicsState()
+
     def mouseMoved_(self, event):
         """Handle mouse movement for hover effect."""
         point = self.convertPoint_fromView_(event.locationInWindow(), None)
