@@ -183,6 +183,13 @@ class Actions(Cocoa.NSObject):
         print("Executing Paste Without Formatting (Cmd+Option+Shift+V)")
         self.sendKeystrokeWithModifiers_({'key_name': 'v', 'modifiers': ['command', 'shift', 'option']})
 
+    def performPixelSnap_(self, sender):
+        """
+        Perform PixelSnap action (Cmd+Option+S).
+        """
+        print("Executing PixelSnap (Cmd+Option+S)")
+        self.sendKeystrokeWithModifiers_({'key_name': 's', 'modifiers': ['command', 'option']})
+
     def performScreenCapture_(self, sender):
         """
         Perform Screen Capture using native macOS screencapture command.

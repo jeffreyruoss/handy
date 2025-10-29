@@ -62,15 +62,16 @@ class MenuUI(Cocoa.NSObject):
 
         # Define secondary menu items (less frequently used)
         secondary_items = [
-            {'title': 'Select All', 'action': 'performSelectAll:', 'target': self.actions},
-            {'title': 'Select All & Copy', 'action': 'performSelectAllCopy:', 'target': self.actions},
-            {'title': 'Screenshot', 'action': 'performScreenCapture:', 'target': self.actions},
-            {'title': 'Restart Handy', 'action': 'performRestart:', 'target': self.actions},
+            {'title': 'Select All', 'action': 'performSelectAll:', 'target': self.actions, 'icon': icon_path('select-all.png')},
+            {'title': 'Select All & Copy', 'action': 'performSelectAllCopy:', 'target': self.actions, 'icon': icon_path('select-all-copy.png')},
+            {'title': 'PixelSnap', 'action': 'performPixelSnap:', 'target': self.actions, 'icon': icon_path('pixelsnap.png')},
+            {'title': 'Screenshot', 'action': 'performScreenCapture:', 'target': self.actions, 'icon': icon_path('screenshot.png')},
+            {'title': 'Restart Handy', 'action': 'performRestart:', 'target': self.actions, 'icon': icon_path('restart.png')},
         ]
 
         # Create window size (radius * 2 + padding)
         menu_size = 420  # Increased from 340 to accommodate larger pie menu
-        secondary_menu_height = 40
+        secondary_menu_height = 150  # Height for 2 rows of 3 columns (85px per row + spacing)
 
         # Get screen height for coordinate conversion
         # macOS screen coords: origin at bottom-left, y increases upward

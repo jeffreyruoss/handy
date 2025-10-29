@@ -19,6 +19,7 @@ class SecondaryMenuView(Cocoa.NSView):
         self.menu_items = []
         self.hovered_index = -1
         self.tracking_area = None
+        self.icon_cache = {}  # Cache loaded icons
 
         return self
 
@@ -55,7 +56,7 @@ class SecondaryMenuView(Cocoa.NSView):
 
     def drawRect_(self, rect):
         """
-        Draw the secondary menu as horizontal buttons.
+        Draw the secondary menu as a grid with max 3 columns.
 
         Args:
             rect: The rectangle to draw in
@@ -69,17 +70,29 @@ class SecondaryMenuView(Cocoa.NSView):
         if num_items == 0:
             return
 
-        # Calculate button width and spacing
+        # Grid layout: max 3 columns
+        max_columns = 3
+        num_columns = min(num_items, max_columns)
+        num_rows = (num_items + num_columns - 1) // num_columns  # Ceiling division
+
+        # Calculate button dimensions and spacing
         total_width = bounds.size.width
+        total_height = bounds.size.height
         button_spacing = 8
-        total_spacing = button_spacing * (num_items + 1)
-        button_width = (total_width - total_spacing) / num_items
-        button_height = bounds.size.height - 10
-        y_offset = 5
+
+        # Calculate button size
+        horizontal_spacing = button_spacing * (num_columns + 1)
+        vertical_spacing = button_spacing * (num_rows + 1)
+        button_width = (total_width - horizontal_spacing) / num_columns
+        button_height = (total_height - vertical_spacing) / num_rows
 
         # Draw each button
         for i, item in enumerate(self.menu_items):
-            x_offset = button_spacing + i * (button_width + button_spacing)
+            row = i // num_columns
+            col = i % num_columns
+
+            x_offset = button_spacing + col * (button_width + button_spacing)
+            y_offset = button_spacing + row * (button_height + button_spacing)
 
             button_rect = Cocoa.NSMakeRect(
                 x_offset,
@@ -108,19 +121,64 @@ class SecondaryMenuView(Cocoa.NSView):
             path.setLineWidth_(1.0)
             path.stroke()
 
-            # Draw text label
+            # Draw icon if available
+            icon_size = 30
+            if 'icon' in item and item['icon']:
+                icon = self.loadIcon_(item['icon'])
+                if icon:
+                    icon_x = x_offset + (button_width - icon_size) / 2
+                    icon_y = y_offset + (button_height - icon_size) / 2 + 8
+                    icon_rect = Cocoa.NSMakeRect(
+                        icon_x,
+                        icon_y,
+                        icon_size,
+                        icon_size
+                    )
+
+                    # Save graphics state
+                    Cocoa.NSGraphicsContext.currentContext().saveGraphicsState()
+
+                    # Create rounded rectangle clipping path for icon
+                    icon_corner_radius = 4
+                    icon_clip_path = Cocoa.NSBezierPath.bezierPathWithRoundedRect_xRadius_yRadius_(
+                        icon_rect,
+                        icon_corner_radius,
+                        icon_corner_radius
+                    )
+                    icon_clip_path.addClip()
+
+                    # Draw the icon
+                    icon.drawInRect_fromRect_operation_fraction_(
+                        icon_rect,
+                        Cocoa.NSZeroRect,
+                        Cocoa.NSCompositeSourceOver,
+                        1.0
+                    )
+
+                    # Restore graphics state
+                    Cocoa.NSGraphicsContext.currentContext().restoreGraphicsState()
+
+            # Draw text label with word wrapping
+            paragraph_style = Cocoa.NSMutableParagraphStyle.alloc().init()
+            paragraph_style.setAlignment_(Cocoa.NSTextAlignmentCenter)
+            paragraph_style.setLineBreakMode_(Cocoa.NSLineBreakByWordWrapping)
+
             attributes = {
-                Cocoa.NSFontAttributeName: Cocoa.NSFont.systemFontOfSize_(11),
-                Cocoa.NSForegroundColorAttributeName: Cocoa.NSColor.whiteColor()
+                Cocoa.NSFontAttributeName: Cocoa.NSFont.systemFontOfSize_(10),
+                Cocoa.NSForegroundColorAttributeName: Cocoa.NSColor.whiteColor(),
+                Cocoa.NSParagraphStyleAttributeName: paragraph_style
             }
 
             title = Cocoa.NSString.stringWithString_(item['title'])
-            text_size = title.sizeWithAttributes_(attributes)
+            # Add padding to button width for text
+            text_max_width = button_width - 8
+            # Offset text down more if icon is present
+            text_y_offset = -14 if 'icon' in item and item['icon'] else 0
             text_rect = Cocoa.NSMakeRect(
-                x_offset + (button_width - text_size.width) / 2,
-                y_offset + (button_height - text_size.height) / 2,
-                text_size.width,
-                text_size.height
+                x_offset + 4,
+                y_offset + (button_height - 50) / 2 + text_y_offset,
+                text_max_width,
+                30  # Max height for wrapped text
             )
             title.drawInRect_withAttributes_(text_rect, attributes)
 
@@ -164,7 +222,7 @@ class SecondaryMenuView(Cocoa.NSView):
 
     def getButtonIndexAtPoint_(self, point):
         """
-        Determine which button contains the point.
+        Determine which button contains the point in grid layout.
 
         Args:
             point: NSPoint to check
@@ -178,22 +236,58 @@ class SecondaryMenuView(Cocoa.NSView):
         if num_items == 0:
             return -1
 
+        # Grid layout: max 3 columns
+        max_columns = 3
+        num_columns = min(num_items, max_columns)
+        num_rows = (num_items + num_columns - 1) // num_columns
+
         # Calculate button dimensions
         total_width = bounds.size.width
+        total_height = bounds.size.height
         button_spacing = 8
-        total_spacing = button_spacing * (num_items + 1)
-        button_width = (total_width - total_spacing) / num_items
-        button_height = bounds.size.height - 10
-        y_offset = 5
 
-        # Check if point is within vertical bounds
-        if point.y < y_offset or point.y > y_offset + button_height:
-            return -1
+        horizontal_spacing = button_spacing * (num_columns + 1)
+        vertical_spacing = button_spacing * (num_rows + 1)
+        button_width = (total_width - horizontal_spacing) / num_columns
+        button_height = (total_height - vertical_spacing) / num_rows
 
-        # Determine which button horizontally
+        # Check each button
         for i in range(num_items):
-            x_offset = button_spacing + i * (button_width + button_spacing)
-            if point.x >= x_offset and point.x <= x_offset + button_width:
+            row = i // num_columns
+            col = i % num_columns
+
+            x_offset = button_spacing + col * (button_width + button_spacing)
+            y_offset = button_spacing + row * (button_height + button_spacing)
+
+            if (point.x >= x_offset and point.x <= x_offset + button_width and
+                point.y >= y_offset and point.y <= y_offset + button_height):
                 return i
 
         return -1
+
+    def loadIcon_(self, icon_path):
+        """
+        Load an icon from the specified path and cache it.
+
+        Args:
+            icon_path: Path to the icon file (PNG, JPEG, WebP)
+
+        Returns:
+            NSImage object or None if loading fails
+        """
+        # Check cache first
+        if icon_path in self.icon_cache:
+            return self.icon_cache[icon_path]
+
+        # Try to load the icon
+        try:
+            icon = Cocoa.NSImage.alloc().initWithContentsOfFile_(icon_path)
+            if icon:
+                # Resize to 18x18 for secondary menu
+                icon.setSize_(Cocoa.NSMakeSize(18, 18))
+                self.icon_cache[icon_path] = icon
+                return icon
+        except Exception as e:
+            print(f"Error loading icon {icon_path}: {e}")
+
+        return None
