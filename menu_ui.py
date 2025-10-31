@@ -21,7 +21,13 @@ class MenuUI(Cocoa.NSObject):
 
         self.actions = Actions.alloc().init()
         self.menu_window = None
+        self.captured_text = None
         return self
+
+    def set_captured_text(self, text):
+        """Store captured text for later use by Copy action."""
+        self.captured_text = text
+        self.actions.set_captured_text(text)
 
     def showMenuAtLocation_(self, location_dict):
         """

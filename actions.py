@@ -22,7 +22,12 @@ class Actions(Cocoa.NSObject):
         if self is None:
             return None
         self.previous_app = None
+        self.captured_text = None
         return self
+
+    def set_captured_text(self, text):
+        """Store captured text for use by Copy action."""
+        self.captured_text = text
 
     def setPreviousApp_(self, app):
         """Store the previously active application."""
@@ -110,13 +115,20 @@ class Actions(Cocoa.NSObject):
 
     def performCopy_(self, sender):
         """
-        Perform copy action (Cmd+C).
+        Perform copy action - use captured text if available, otherwise Cmd+C.
 
         Args:
             sender: The menu item that triggered this action
         """
-        print("Executing Copy (Cmd+C)")
-        self.sendKeystroke_('c')
+        if self.captured_text:
+            print(f"Copying captured text to clipboard: {self.captured_text[:50]}...")
+            import Cocoa
+            pasteboard = Cocoa.NSPasteboard.generalPasteboard()
+            pasteboard.clearContents()
+            pasteboard.setString_forType_(self.captured_text, Cocoa.NSPasteboardTypeString)
+        else:
+            print("Executing Copy (Cmd+C)")
+            self.sendKeystroke_('c')
 
     def performPaste_(self, sender):
         """
