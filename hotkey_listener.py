@@ -24,31 +24,35 @@ class HotkeyListener:
         """
         Capture the current selection to temporary storage.
         This is needed for browsers that deselect text on middle-click.
-        We do this before the browser has a chance to clear the selection.
+        We use CGEvent for fastest possible execution.
         """
-        import subprocess
         import time
         import Cocoa
+        import Quartz
 
         try:
             # Save current clipboard content
             pasteboard = Cocoa.NSPasteboard.generalPasteboard()
             old_clipboard = pasteboard.stringForType_(Cocoa.NSPasteboardTypeString)
 
-            # Send Cmd+C to capture selection
-            script = '''
-            tell application "System Events"
-                keystroke "c" using command down
-            end tell
-            '''
-            subprocess.run(
-                ['osascript', '-e', script],
-                capture_output=True,
-                text=True,
-                timeout=0.5
-            )
+            # Send Cmd+C using CGEvent (much faster than AppleScript)
+            # Create a Cmd+C key event
+            source = Quartz.CGEventSourceCreate(Quartz.kCGEventSourceStateHIDSystemState)
+
+            # Key code for 'C' is 8
+            key_down = Quartz.CGEventCreateKeyboardEvent(source, 8, True)
+            key_up = Quartz.CGEventCreateKeyboardEvent(source, 8, False)
+
+            # Set Command flag
+            Quartz.CGEventSetFlags(key_down, Quartz.kCGEventFlagMaskCommand)
+            Quartz.CGEventSetFlags(key_up, Quartz.kCGEventFlagMaskCommand)
+
+            # Post the events
+            Quartz.CGEventPost(Quartz.kCGHIDEventTap, key_down)
+            Quartz.CGEventPost(Quartz.kCGHIDEventTap, key_up)
+
             # Wait for clipboard to update
-            time.sleep(0.15)
+            time.sleep(0.1)
 
             # Read the newly captured text
             self.captured_clipboard = pasteboard.stringForType_(Cocoa.NSPasteboardTypeString)
