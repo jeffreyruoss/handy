@@ -190,6 +190,13 @@ class Actions(Cocoa.NSObject):
         print("Executing PixelSnap (Cmd+Option+S)")
         self.sendKeystrokeWithModifiers_({'key_name': 's', 'modifiers': ['command', 'option']})
 
+    def performColorSlurp_(self, sender):
+        """
+        Perform ColorSlurp action (Cmd+Option+Control+C).
+        """
+        print("Executing ColorSlurp (Cmd+Option+Control+C)")
+        self.sendKeystrokeWithModifiers_({'key_name': 'c', 'modifiers': ['command', 'option', 'control']})
+
     def performScreenCapture_(self, sender):
         """
         Perform Screen Capture using native macOS screencapture command.
