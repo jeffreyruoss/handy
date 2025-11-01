@@ -76,16 +76,27 @@ class LeftMenuView(Cocoa.NSView):
         if num_items == 0:
             return
 
-        # Calculate button dimensions and spacing
-        total_height = bounds.size.height
+        # === ADJUSTABLE PARAMETERS ===
+        button_spacing = 6              # Space between buttons
+        vertical_button_padding = 8     # Padding inside button (top and bottom)
+        icon_text_spacing = 4           # Space between icon and text
+        icon_size = 30                  # Icon size
+        text_height = 12                # Approximate text height
+        # ============================
+
+        # Calculate button height based on content
+        button_height = (vertical_button_padding * 2) + icon_size + icon_text_spacing + text_height
         button_width = bounds.size.width
-        button_spacing = 8
-        vertical_spacing = button_spacing * (num_items + 1)
-        button_height = (total_height - vertical_spacing) / num_items
+
+        # Calculate total grid height
+        total_grid_height = (num_items * button_height) + ((num_items - 1) * button_spacing)
+
+        # Center the buttons vertically
+        start_y = (bounds.size.height - total_grid_height) / 2
 
         # Draw each button vertically
         for i, item in enumerate(self.menu_items):
-            y_offset = button_spacing + i * (button_height + button_spacing)
+            y_offset = start_y + i * (button_height + button_spacing)
 
             button_rect = Cocoa.NSMakeRect(
                 0,
@@ -115,12 +126,11 @@ class LeftMenuView(Cocoa.NSView):
             path.stroke()
 
             # Draw icon if available
-            icon_size = 30
             if 'icon' in item and item['icon']:
                 icon = self.loadIcon_(item['icon'])
                 if icon:
                     icon_x = (button_width - icon_size) / 2
-                    icon_y = y_offset + (button_height - icon_size) / 2 + 8
+                    icon_y = y_offset + vertical_button_padding + text_height + icon_text_spacing
                     icon_rect = Cocoa.NSMakeRect(
                         icon_x,
                         icon_y,
@@ -157,19 +167,18 @@ class LeftMenuView(Cocoa.NSView):
             paragraph_style.setLineBreakMode_(Cocoa.NSLineBreakByWordWrapping)
 
             attributes = {
-                Cocoa.NSFontAttributeName: Cocoa.NSFont.systemFontOfSize_(9),
+                Cocoa.NSFontAttributeName: Cocoa.NSFont.systemFontOfSize_(text_height),
                 Cocoa.NSForegroundColorAttributeName: Cocoa.NSColor.whiteColor(),
                 Cocoa.NSParagraphStyleAttributeName: paragraph_style
             }
 
             title = Cocoa.NSString.stringWithString_(item['title'])
             text_max_width = button_width - 4
-            text_y_offset = -16 if 'icon' in item and item['icon'] else 0
             text_rect = Cocoa.NSMakeRect(
                 2,
-                y_offset + (button_height - 30) / 2 + text_y_offset,
+                y_offset + vertical_button_padding,
                 text_max_width,
-                20
+                text_height
             )
             title.drawInRect_withAttributes_(text_rect, attributes)
 
@@ -247,16 +256,26 @@ class LeftMenuView(Cocoa.NSView):
         if num_items == 0:
             return -1
 
+        # === Adjustable parameters (must match drawRect_) ===
+        button_spacing = 4
+        vertical_button_padding = 6
+        icon_text_spacing = 4
+        icon_size = 30
+        text_height = 12
+        # === End parameters ===
+
         # Calculate button dimensions
         total_height = bounds.size.height
         button_width = bounds.size.width
-        button_spacing = 8
-        vertical_spacing = button_spacing * (num_items + 1)
-        button_height = (total_height - vertical_spacing) / num_items
+        button_height = (vertical_button_padding * 2) + icon_size + icon_text_spacing + text_height
+
+        # Calculate vertical centering
+        total_grid_height = (button_height * num_items) + (button_spacing * (num_items - 1))
+        start_y = (bounds.size.height - total_grid_height) / 2
 
         # Check each button
         for i in range(num_items):
-            y_offset = button_spacing + i * (button_height + button_spacing)
+            y_offset = start_y + i * (button_height + button_spacing)
 
             if (point.x >= 0 and point.x <= button_width and
                 point.y >= y_offset and point.y <= y_offset + button_height):

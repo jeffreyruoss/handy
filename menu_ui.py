@@ -65,12 +65,12 @@ class MenuUI(Cocoa.NSObject):
         # Add PNG files to icons/ and they'll be automatically found
         # Pie starts at top and goes clockwise
         menu_items = [
-            {'title': 'Dictation', 'action': 'performDictation:', 'target': self.actions, 'icon': icon_path('dictation.png')},
             {'title': 'Paste Plain', 'action': 'performPastePlain:', 'target': self.actions, 'icon': icon_path('paste-plain.png')},
             {'title': 'Paste', 'action': 'performPaste:', 'target': self.actions, 'icon': icon_path('paste.png')},
             {'title': 'Copy', 'action': 'performCopy:', 'target': self.actions, 'icon': icon_path('copy.png')},
             {'title': 'Save', 'action': 'performSave:', 'target': self.actions, 'icon': icon_path('save.png')},
             {'title': 'Find', 'action': 'performFind:', 'target': self.actions, 'icon': icon_path('find.png')},
+            {'title': 'Dictation', 'action': 'performDictation:', 'target': self.actions, 'icon': icon_path('dictation.png')},
             {'title': 'Undo', 'action': 'performUndo:', 'target': self.actions, 'icon': icon_path('undo.png')},
             {'title': 'Escape', 'action': 'performEscape:', 'target': self.actions, 'icon': icon_path('escape.png')},
             {'title': 'Tab', 'action': 'performTab:', 'target': self.actions, 'icon': icon_path('tab.png')},
