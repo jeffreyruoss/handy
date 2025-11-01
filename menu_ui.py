@@ -189,6 +189,22 @@ class MenuUI(Cocoa.NSObject):
             self.menu_window.orderOut_(None)
             self.menu_window = None
 
+    def update_hover_at_position(self, x, y):
+        """
+        Update hover state based on global mouse position.
+        This can be called from any thread; it will execute on the main thread.
+
+        Args:
+            x: X coordinate in screen space
+            y: Y coordinate in screen space
+        """
+        position_dict = {'x': x, 'y': y}
+        self.performSelectorOnMainThread_withObject_waitUntilDone_(
+            "updateHoverAtPositionOnMainThread:",
+            position_dict,
+            False
+        )
+
     def trigger_item_at_cursor(self):
         """
         Trigger the menu item currently under the cursor.
@@ -199,6 +215,45 @@ class MenuUI(Cocoa.NSObject):
             None,
             False
         )
+
+    def updateHoverAtPositionOnMainThread_(self, position_dict):
+        """
+        Update hover state at the given screen position on the main thread.
+
+        Args:
+            position_dict: Dictionary with 'x' and 'y' keys for screen coordinates
+        """
+        if not self.menu_window or not self.menu_window.isVisible():
+            return
+
+        x = position_dict['x']
+        y = position_dict['y']
+
+        # Convert from screen coordinates (pynput uses top-left origin)
+        # to Cocoa screen coordinates (bottom-left origin)
+        main_screen = Cocoa.NSScreen.mainScreen()
+        screen_frame = main_screen.frame()
+        screen_height = screen_frame.size.height
+
+        # Create NSPoint in Cocoa screen coordinates
+        mouse_location = Cocoa.NSMakePoint(x, screen_height - y)
+
+        # Convert to window coordinates
+        window_point = self.menu_window.convertPointFromScreen_(mouse_location)
+
+        # Get the content view
+        content_view = self.menu_window.contentView()
+        if not content_view:
+            return
+
+        # Hit test to find which view is under the cursor
+        hit_view = content_view.hitTest_(window_point)
+
+        if hit_view and hasattr(hit_view, 'updateHoveredIndex_'):
+            # Convert point to hit view's coordinate system
+            point_in_view = hit_view.convertPoint_fromView_(window_point, None)
+            # Update the hover state
+            hit_view.updateHoveredIndex_(point_in_view)
 
     def triggerItemAtCursorOnMainThread_(self, _):
         """

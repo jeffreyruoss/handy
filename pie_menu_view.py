@@ -235,6 +235,18 @@ class PieMenuView(Cocoa.NSView):
 
         self.updateHoveredIndex_(point)
 
+    def mouseDragged_(self, event):
+        """Handle left mouse button drag."""
+        self.mouseMoved_(event)
+
+    def rightMouseDragged_(self, event):
+        """Handle right mouse button drag."""
+        self.mouseMoved_(event)
+
+    def otherMouseDragged_(self, event):
+        """Handle other mouse button drag (middle button)."""
+        self.mouseMoved_(event)
+
     def mouseDown_(self, event):
         """Handle mouse click to select menu item."""
         point = self.convertPoint_fromView_(event.locationInWindow(), None)

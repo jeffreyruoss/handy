@@ -70,6 +70,18 @@ class HotkeyListener:
             print(f"Error capturing selection: {e}")
             self.captured_clipboard = None
 
+    def on_move(self, x, y):
+        """
+        Callback for mouse move events.
+
+        Args:
+            x: Mouse x coordinate
+            y: Mouse y coordinate
+        """
+        # Update hover state while middle button is held
+        if self.middle_button_held and self.menu_ui.is_menu_visible():
+            self.menu_ui.update_hover_at_position(x, y)
+
     def on_click(self, x, y, button, pressed):
         """
         Callback for mouse click events.
@@ -105,7 +117,7 @@ class HotkeyListener:
 
     def start(self):
         """Start listening for mouse events."""
-        self.listener = mouse.Listener(on_click=self.on_click)
+        self.listener = mouse.Listener(on_click=self.on_click, on_move=self.on_move)
         self.listener.start()
         print("Listening for mouse wheel button press...")
 
