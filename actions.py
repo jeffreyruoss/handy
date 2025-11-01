@@ -170,6 +170,26 @@ class Actions(Cocoa.NSObject):
         print("Executing Switch Window (Cmd+`)")
         self.sendKeystrokeWithModifiers_({'key_name': '`', 'modifiers': ['command']})
 
+    def performEscape_(self, sender):
+        """
+        Perform Escape action (Esc key).
+
+        Args:
+            sender: The menu item that triggered this action
+        """
+        print("Executing Escape")
+        self.sendKeystrokeWithModifiers_({'key_name': '\x1b', 'modifiers': []})
+
+    def performTab_(self, sender):
+        """
+        Perform Tab action (Tab key).
+
+        Args:
+            sender: The menu item that triggered this action
+        """
+        print("Executing Tab")
+        self.sendKeystrokeWithModifiers_({'key_name': '\t', 'modifiers': []})
+
     def performRestart_(self, sender):
         """
         Restart the application.

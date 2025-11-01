@@ -62,6 +62,8 @@ class MenuUI(Cocoa.NSObject):
             {'title': 'Paste', 'action': 'performPaste:', 'target': self.actions, 'icon': icon_path('paste.png')},
             {'title': 'Copy', 'action': 'performCopy:', 'target': self.actions, 'icon': icon_path('copy.png')},
             {'title': 'Save', 'action': 'performSave:', 'target': self.actions, 'icon': icon_path('save.png')},
+            {'title': 'Escape', 'action': 'performEscape:', 'target': self.actions, 'icon': icon_path('escape.png')},
+            {'title': 'Tab', 'action': 'performTab:', 'target': self.actions, 'icon': icon_path('tab.png')},
             {'title': 'Alfred', 'action': 'performAlfred:', 'target': self.actions, 'icon': icon_path('alfred.png')},
             {'title': 'Switch Window', 'action': 'performSwitchWindow:', 'target': self.actions, 'icon': icon_path('switch-window.png')},
             {'title': 'Notion', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Notion.app', 'icon': icon_path('notion.png')},
