@@ -26,17 +26,13 @@ class PieMenuView(Cocoa.NSView):
         # Set up tracking area for mouse hover
         self.tracking_area = None
 
-        print("[DEBUG] PieMenuView initialized")
-
         return self
 
     def updateTrackingAreas(self):
         """Set up mouse tracking for hover effects."""
-        print("[DEBUG] updateTrackingAreas called")
         objc.super(PieMenuView, self).updateTrackingAreas()
 
         if self.tracking_area:
-            print("[DEBUG] Removing old tracking area")
             self.removeTrackingArea_(self.tracking_area)
 
         tracking_options = (
@@ -53,15 +49,11 @@ class PieMenuView(Cocoa.NSView):
             None
         )
         self.addTrackingArea_(self.tracking_area)
-        print(f"[DEBUG] Added tracking area with options: {tracking_options}, bounds: {self.bounds()}")
 
     def resetCursorRects(self):
         """Set up cursor rectangles for the entire view."""
-        print("[DEBUG] resetCursorRects called")
         objc.super(PieMenuView, self).resetCursorRects()
-        # Add the pointing hand cursor for the entire pie menu area
         self.addCursorRect_cursor_(self.bounds(), Cocoa.NSCursor.pointingHandCursor())
-        print("[DEBUG] Added cursor rect")
 
     def setMenuItems_(self, items):
         """
@@ -230,32 +222,20 @@ class PieMenuView(Cocoa.NSView):
                 # Restore graphics state
                 Cocoa.NSGraphicsContext.currentContext().restoreGraphicsState()
 
-    def mouseEntered_(self, event):
-        """Handle mouse entering the view."""
-        print("[DEBUG] mouseEntered called")
-
-    def mouseExited_(self, event):
-        """Handle mouse exiting the view."""
-        print("[DEBUG] mouseExited called")
-
     def mouseMoved_(self, event):
         """Handle mouse movement for hover effect."""
         point = self.convertPoint_fromView_(event.locationInWindow(), None)
         index = self.getSliceIndexAtPoint_(point)
-        print(f"[DEBUG] mouseMoved: point=({point.x:.1f}, {point.y:.1f}), index={index}, hovered_index={self.hovered_index}")
 
         # Update cursor based on whether we're over a slice
         if index >= 0:
-            print(f"[DEBUG] Setting pointing hand cursor for slice {index}")
             Cocoa.NSCursor.pointingHandCursor().set()
         else:
-            print("[DEBUG] Setting arrow cursor")
             Cocoa.NSCursor.arrowCursor().set()
 
         self.updateHoveredIndex_(point)
 
     def mouseDown_(self, event):
-        print("[DEBUG] mouseDown called")
         """Handle mouse click to select menu item."""
         point = self.convertPoint_fromView_(event.locationInWindow(), None)
         index = self.getSliceIndexAtPoint_(point)
@@ -287,7 +267,6 @@ class PieMenuView(Cocoa.NSView):
         """Update which slice is being hovered."""
         new_index = self.getSliceIndexAtPoint_(point)
         if new_index != self.hovered_index:
-            print(f"[DEBUG] Hover changed: {self.hovered_index} -> {new_index}")
             self.hovered_index = new_index
             self.setNeedsDisplay_(True)
 

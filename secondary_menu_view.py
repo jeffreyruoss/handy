@@ -33,7 +33,8 @@ class SecondaryMenuView(Cocoa.NSView):
         tracking_options = (
             Cocoa.NSTrackingMouseEnteredAndExited |
             Cocoa.NSTrackingMouseMoved |
-            Cocoa.NSTrackingActiveInKeyWindow
+            Cocoa.NSTrackingActiveAlways |
+            Cocoa.NSTrackingInVisibleRect
         )
 
         self.tracking_area = Cocoa.NSTrackingArea.alloc().initWithRect_options_owner_userInfo_(
@@ -43,6 +44,11 @@ class SecondaryMenuView(Cocoa.NSView):
             None
         )
         self.addTrackingArea_(self.tracking_area)
+
+    def resetCursorRects(self):
+        """Set up cursor rectangles for the entire view."""
+        objc.super(SecondaryMenuView, self).resetCursorRects()
+        self.addCursorRect_cursor_(self.bounds(), Cocoa.NSCursor.pointingHandCursor())
 
     def setMenuItems_(self, items):
         """
@@ -110,7 +116,7 @@ class SecondaryMenuView(Cocoa.NSView):
 
             # Fill color - highlight if hovered
             if i == self.hovered_index:
-                Cocoa.NSColor.colorWithCalibratedRed_green_blue_alpha_(0.3, 0.5, 0.8, 0.9).setFill()
+                Cocoa.NSColor.colorWithCalibratedRed_green_blue_alpha_(0.35, 0.35, 0.35, 0.9).setFill()
             else:
                 Cocoa.NSColor.colorWithCalibratedRed_green_blue_alpha_(0.25, 0.25, 0.25, 0.85).setFill()
 
@@ -185,6 +191,14 @@ class SecondaryMenuView(Cocoa.NSView):
     def mouseMoved_(self, event):
         """Handle mouse movement for hover effect."""
         point = self.convertPoint_fromView_(event.locationInWindow(), None)
+        index = self.getButtonIndexAtPoint_(point)
+
+        # Update cursor based on whether we're over a button
+        if index >= 0:
+            Cocoa.NSCursor.pointingHandCursor().set()
+        else:
+            Cocoa.NSCursor.arrowCursor().set()
+
         self.updateHoveredIndex_(point)
 
     def mouseDown_(self, event):
