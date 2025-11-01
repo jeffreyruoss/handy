@@ -111,7 +111,7 @@ class PieMenuView(Cocoa.NSView):
 
             # Calculate position for icon and text
             mid_angle = start_angle + angle_per_slice / 2
-            content_radius = self.radius * 0.65
+            content_radius = self.radius * 0.75
             content_x = center_x + content_radius * math.cos(mid_angle)
             content_y = center_y + content_radius * math.sin(mid_angle)
 
@@ -122,7 +122,7 @@ class PieMenuView(Cocoa.NSView):
                 if icon:
                     icon_rect = Cocoa.NSMakeRect(
                         content_x - icon_size / 2,
-                        content_y - icon_size / 2 + 15,  # Offset up from center
+                        content_y - icon_size / 2 + 10,  # Offset up from center
                         icon_size,
                         icon_size
                     )
