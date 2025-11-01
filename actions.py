@@ -140,6 +140,36 @@ class Actions(Cocoa.NSObject):
         print("Executing Paste (Cmd+V)")
         self.sendKeystroke_('v')
 
+    def performSave_(self, sender):
+        """
+        Perform save action (Cmd+S).
+
+        Args:
+            sender: The menu item that triggered this action
+        """
+        print("Executing Save (Cmd+S)")
+        self.sendKeystroke_('s')
+
+    def performAlfred_(self, sender):
+        """
+        Perform Alfred action (Option+Space).
+
+        Args:
+            sender: The menu item that triggered this action
+        """
+        print("Executing Alfred (Option+Space)")
+        self.sendKeystrokeWithModifiers_({'key_name': ' ', 'modifiers': ['option']})
+
+    def performSwitchWindow_(self, sender):
+        """
+        Perform Switch Window action (Cmd+`).
+
+        Args:
+            sender: The menu item that triggered this action
+        """
+        print("Executing Switch Window (Cmd+`)")
+        self.sendKeystrokeWithModifiers_({'key_name': '`', 'modifiers': ['command']})
+
     def performRestart_(self, sender):
         """
         Restart the application.
