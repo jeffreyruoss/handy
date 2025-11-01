@@ -190,6 +190,36 @@ class Actions(Cocoa.NSObject):
         print("Executing Tab")
         self.sendKeystrokeWithModifiers_({'key_name': '\t', 'modifiers': []})
 
+    def performFind_(self, sender):
+        """
+        Perform Find action (Cmd+F).
+
+        Args:
+            sender: The menu item that triggered this action
+        """
+        print("Executing Find (Cmd+F)")
+        self.sendKeystrokeWithModifiers_({'key_name': 'f', 'modifiers': ['command']})
+
+    def performUndo_(self, sender):
+        """
+        Perform Undo action (Cmd+Z).
+
+        Args:
+            sender: The menu item that triggered this action
+        """
+        print("Executing Undo (Cmd+Z)")
+        self.sendKeystrokeWithModifiers_({'key_name': 'z', 'modifiers': ['command']})
+
+    def performDeselect_(self, sender):
+        """
+        Perform Deselect action (Cmd+D).
+
+        Args:
+            sender: The menu item that triggered this action
+        """
+        print("Executing Deselect (Cmd+D)")
+        self.sendKeystrokeWithModifiers_({'key_name': 'd', 'modifiers': ['command']})
+
     def performRestart_(self, sender):
         """
         Restart the application.
