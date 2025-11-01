@@ -116,12 +116,15 @@ class MenuUI(Cocoa.NSObject):
         self.menu_window.setLevel_(Cocoa.NSFloatingWindowLevel)
         self.menu_window.setHasShadow_(True)
         self.menu_window.setIgnoresMouseEvents_(False)
+        self.menu_window.setAcceptsMouseMovedEvents_(True)
 
         # Create pie menu view
         pie_view = PieMenuView.alloc().initWithFrame_(
             Cocoa.NSMakeRect(0, 0, menu_size, menu_size)
         )
         pie_view.setMenuItems_(menu_items)
+        print(f"[DEBUG] Created pie_view with frame: {pie_view.frame()}")
+        print(f"[DEBUG] Window will accept mouse moved events: {self.menu_window.acceptsMouseMovedEvents()}")
 
         # Create container view that holds both pie menu and secondary menu
         from secondary_menu_view import SecondaryMenuView
