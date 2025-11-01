@@ -51,6 +51,15 @@ class MenuUI(Cocoa.NSObject):
         if active_app:
             self.actions.setPreviousApp_(active_app)
 
+        # Define left menu items (app shortcuts)
+        left_menu_items = [
+            {'title': 'Alfred', 'action': 'performAlfred:', 'target': self.actions, 'icon': icon_path('alfred.png')},
+            {'title': 'Pastebot', 'action': 'performPastebot:', 'target': self.actions, 'icon': icon_path('pastebot.png')},
+            {'title': 'VS Code', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Visual Studio Code - Insiders.app', 'icon': icon_path('vscode.png')},
+            {'title': 'Dia', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Dia.app', 'icon': icon_path('dia.png')},
+            {'title': 'Notion', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Notion.app', 'icon': icon_path('notion.png')},
+        ]
+
         # Define menu items for pie menu (frequently used)
         # Icons are loaded from the icons/ directory
         # Add PNG files to icons/ and they'll be automatically found
@@ -58,17 +67,12 @@ class MenuUI(Cocoa.NSObject):
         menu_items = [
             {'title': 'Dictation', 'action': 'performDictation:', 'target': self.actions, 'icon': icon_path('dictation.png')},
             {'title': 'Paste Plain', 'action': 'performPastePlain:', 'target': self.actions, 'icon': icon_path('paste-plain.png')},
-            {'title': 'Pastebot', 'action': 'performPastebot:', 'target': self.actions, 'icon': icon_path('pastebot.png')},
             {'title': 'Paste', 'action': 'performPaste:', 'target': self.actions, 'icon': icon_path('paste.png')},
             {'title': 'Copy', 'action': 'performCopy:', 'target': self.actions, 'icon': icon_path('copy.png')},
             {'title': 'Save', 'action': 'performSave:', 'target': self.actions, 'icon': icon_path('save.png')},
             {'title': 'Escape', 'action': 'performEscape:', 'target': self.actions, 'icon': icon_path('escape.png')},
             {'title': 'Tab', 'action': 'performTab:', 'target': self.actions, 'icon': icon_path('tab.png')},
-            {'title': 'Alfred', 'action': 'performAlfred:', 'target': self.actions, 'icon': icon_path('alfred.png')},
             {'title': 'Switch Window', 'action': 'performSwitchWindow:', 'target': self.actions, 'icon': icon_path('switch-window.png')},
-            {'title': 'Notion', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Notion.app', 'icon': icon_path('notion.png')},
-            {'title': 'VS Code', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Visual Studio Code - Insiders.app', 'icon': icon_path('vscode.png')},
-            {'title': 'Dia', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Dia.app', 'icon': icon_path('dia.png')},
         ]
 
         # Define secondary menu items (less frequently used)
@@ -82,8 +86,10 @@ class MenuUI(Cocoa.NSObject):
         ]
 
         # Create window size (radius * 2 + padding)
-        menu_size = 420  # Increased from 340 to accommodate larger pie menu
-        secondary_menu_height = 150  # Height for 2 rows of 3 columns (85px per row + spacing)
+        menu_size = 420  # Pie menu size
+        secondary_menu_height = 150  # Height for 2 rows of 3 columns
+        left_menu_width = 60  # Width for left menu
+        gap = 10  # Gap between menus
 
         # Get screen height for coordinate conversion
         # macOS screen coords: origin at bottom-left, y increases upward
@@ -94,14 +100,15 @@ class MenuUI(Cocoa.NSObject):
 
         # Convert from screen coordinates (bottom-left origin) to window position (top-left origin)
         # Center the menu on the cursor position
-        total_height = menu_size + secondary_menu_height + 10
-        window_x = x - menu_size / 2
+        total_height = menu_size + secondary_menu_height + gap
+        total_width = left_menu_width + gap + menu_size
+        window_x = x - (left_menu_width + gap + menu_size / 2)
         window_y = screen_height - y - menu_size / 2
 
         window_rect = Cocoa.NSMakeRect(
             window_x,
-            window_y - secondary_menu_height - 10,  # Shift up to account for secondary menu
-            menu_size,
+            window_y - secondary_menu_height - gap,  # Shift up to account for secondary menu
+            total_width,
             total_height
         )        # Create a borderless, transparent window
         style_mask = Cocoa.NSWindowStyleMaskBorderless
@@ -120,27 +127,31 @@ class MenuUI(Cocoa.NSObject):
         self.menu_window.setIgnoresMouseEvents_(False)
         self.menu_window.setAcceptsMouseMovedEvents_(True)
 
+        # Create container view that holds all menus
+        from secondary_menu_view import SecondaryMenuView
+        from left_menu_view import LeftMenuView
+
+        container_view = Cocoa.NSView.alloc().initWithFrame_(
+            Cocoa.NSMakeRect(0, 0, total_width, total_height)
+        )
+
+        # Create and position left menu (vertical, full height of pie menu)
+        left_view = LeftMenuView.alloc().initWithFrame_(
+            Cocoa.NSMakeRect(0, secondary_menu_height + gap, left_menu_width, menu_size)
+        )
+        left_view.setMenuItems_(left_menu_items)
+        container_view.addSubview_(left_view)
+
         # Create pie menu view
         pie_view = PieMenuView.alloc().initWithFrame_(
-            Cocoa.NSMakeRect(0, 0, menu_size, menu_size)
+            Cocoa.NSMakeRect(left_menu_width + gap, secondary_menu_height + gap, menu_size, menu_size)
         )
         pie_view.setMenuItems_(menu_items)
-
-        # Create container view that holds both pie menu and secondary menu
-        from secondary_menu_view import SecondaryMenuView
-
-        total_height = menu_size + secondary_menu_height + 10  # 10px gap
-        container_view = Cocoa.NSView.alloc().initWithFrame_(
-            Cocoa.NSMakeRect(0, 0, menu_size, total_height)
-        )
-
-        # Position pie menu at the top of container
-        pie_view.setFrameOrigin_(Cocoa.NSMakePoint(0, secondary_menu_height + 10))
         container_view.addSubview_(pie_view)
 
-        # Create and position secondary menu at the bottom
+        # Create and position secondary menu at the bottom (offset by left menu width)
         secondary_view = SecondaryMenuView.alloc().initWithFrame_(
-            Cocoa.NSMakeRect(0, 0, menu_size, secondary_menu_height)
+            Cocoa.NSMakeRect(left_menu_width + gap, 0, menu_size, secondary_menu_height)
         )
         secondary_view.setMenuItems_(secondary_items)
         container_view.addSubview_(secondary_view)
