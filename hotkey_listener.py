@@ -19,6 +19,7 @@ class HotkeyListener:
         self.menu_ui = menu_ui
         self.listener = None
         self.captured_clipboard = None  # Temporary storage for captured clipboard
+        self.middle_button_held = False  # Track if middle button is being held
 
     def capture_selection_immediately(self):
         """
@@ -79,19 +80,28 @@ class HotkeyListener:
             button: Mouse button that was clicked
             pressed: True if pressed, False if released
         """
-        # Check for middle button (mouse wheel) press
-        if button == mouse.Button.middle and pressed:
-            # Toggle menu: close if open, show if closed
-            if self.menu_ui.is_menu_visible():
-                print("Mouse wheel clicked - closing menu")
-                self.menu_ui.close_menu()
+        # Check for middle button (mouse wheel)
+        if button == mouse.Button.middle:
+            if pressed:
+                # Middle button pressed
+                self.middle_button_held = True
+                # Toggle menu: close if open, show if closed
+                if self.menu_ui.is_menu_visible():
+                    print("Mouse wheel clicked - closing menu")
+                    self.menu_ui.close_menu()
+                else:
+                    print(f"Mouse wheel clicked at ({x}, {y})")
+                    # Capture selection BEFORE showing menu (helps with browsers that deselect on middle-click)
+                    self.capture_selection_immediately()
+                    # Pass captured clipboard to menu UI
+                    self.menu_ui.set_captured_text(self.captured_clipboard)
+                    self.menu_ui.show_menu(x, y)
             else:
-                print(f"Mouse wheel clicked at ({x}, {y})")
-                # Capture selection BEFORE showing menu (helps with browsers that deselect on middle-click)
-                self.capture_selection_immediately()
-                # Pass captured clipboard to menu UI
-                self.menu_ui.set_captured_text(self.captured_clipboard)
-                self.menu_ui.show_menu(x, y)
+                # Middle button released
+                if self.middle_button_held and self.menu_ui.is_menu_visible():
+                    print(f"Mouse wheel released at ({x}, {y}) - triggering menu item")
+                    self.menu_ui.trigger_item_at_cursor()
+                self.middle_button_held = False
 
     def start(self):
         """Start listening for mouse events."""

@@ -289,8 +289,8 @@ class PieMenuView(Cocoa.NSView):
         dy = point.y - center_y
         distance = math.sqrt(dx * dx + dy * dy)
 
-        # Check if outside the menu
-        if distance > self.radius:
+        # Check if outside the menu or in the inner half of center circle
+        if distance > self.radius or distance < self.center_radius / 2:
             return -1
 
         # Calculate angle

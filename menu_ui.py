@@ -189,6 +189,59 @@ class MenuUI(Cocoa.NSObject):
             self.menu_window.orderOut_(None)
             self.menu_window = None
 
+    def trigger_item_at_cursor(self):
+        """
+        Trigger the menu item currently under the cursor.
+        This can be called from any thread; it will execute on the main thread.
+        """
+        self.performSelectorOnMainThread_withObject_waitUntilDone_(
+            "triggerItemAtCursorOnMainThread:",
+            None,
+            False
+        )
+
+    def triggerItemAtCursorOnMainThread_(self, _):
+        """
+        Trigger the menu item at the current cursor position on the main thread.
+        """
+        if not self.menu_window or not self.menu_window.isVisible():
+            return
+
+        # Get current mouse location in screen coordinates
+        mouse_location = Cocoa.NSEvent.mouseLocation()
+
+        # Convert to window coordinates
+        window_point = self.menu_window.convertPointFromScreen_(mouse_location)
+
+        # Get the content view
+        content_view = self.menu_window.contentView()
+        if not content_view:
+            return
+
+        # Hit test to find which view is under the cursor
+        hit_view = content_view.hitTest_(window_point)
+
+        if hit_view:
+            # Convert point to hit view's coordinate system
+            point_in_view = hit_view.convertPoint_fromView_(window_point, None)
+
+            # Create a fake mouse down event at this location
+            fake_event = Cocoa.NSEvent.mouseEventWithType_location_modifierFlags_timestamp_windowNumber_context_eventNumber_clickCount_pressure_(
+                Cocoa.NSEventTypeLeftMouseDown,
+                window_point,
+                0,
+                0,
+                self.menu_window.windowNumber(),
+                None,
+                0,
+                1,
+                1.0
+            )
+
+            # Send the mouse down event to the view
+            if hasattr(hit_view, 'mouseDown_'):
+                hit_view.mouseDown_(fake_event)
+
     def is_menu_visible(self):
         """
         Check if the menu is currently visible.
