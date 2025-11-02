@@ -86,8 +86,10 @@ class PieMenuView(Cocoa.NSView):
         # Number of slices
         num_items = len(self.menu_items)
         angle_per_slice = 2 * math.pi / num_items
-        # Draw each pie slice (start at 12 o'clock, go clockwise)
-        for i, item in enumerate(self.menu_items):
+        # Draw each pie slice starting at top, going clockwise
+        # Rotate the menu items so first item is at top instead of bottom
+        rotated_items = self.menu_items[num_items//2:] + self.menu_items[:num_items//2]
+        for i, item in enumerate(rotated_items):
             start_angle = -math.pi / 2 - i * angle_per_slice
             end_angle = start_angle - angle_per_slice
 
@@ -104,7 +106,9 @@ class PieMenuView(Cocoa.NSView):
             path.closePath()
 
             # Fill color - highlight if hovered
-            if i == self.hovered_index:
+            # i is visual index, convert to array index for comparison
+            array_index = (i + num_items // 2) % num_items
+            if array_index == self.hovered_index:
                 Cocoa.NSColor.colorWithCalibratedRed_green_blue_alpha_(0.35, 0.35, 0.35, 0.9).setFill()
             else:
                 Cocoa.NSColor.colorWithCalibratedRed_green_blue_alpha_(0.2, 0.2, 0.2, 0.85).setFill()
@@ -309,14 +313,15 @@ class PieMenuView(Cocoa.NSView):
         # Calculate angle from center to point
         angle = math.atan2(dy, dx)
 
-        # Our rendering starts at -pi/2 and goes clockwise (negative direction)
-        # So we need to: negate the angle, then offset by -pi/2
-        adjusted_angle = (-angle - math.pi / 2) % (2 * math.pi)
-
-        # Determine which slice
+        # Match the rendering rotation
         num_items = len(self.menu_items)
         angle_per_slice = 2 * math.pi / num_items
-        slice_index = int(adjusted_angle / angle_per_slice) % num_items
+        adjusted_angle = (-angle - math.pi / 2) % (2 * math.pi)
+
+        # Get visual slice index, then map back to array index
+        visual_index = int(adjusted_angle / angle_per_slice) % num_items
+        # Reverse the rotation we applied in rendering
+        slice_index = (visual_index - num_items // 2) % num_items
 
         return slice_index if slice_index < num_items else -1
 
