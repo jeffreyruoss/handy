@@ -53,11 +53,11 @@ class MenuUI(Cocoa.NSObject):
 
         # Define left menu items (app shortcuts)
         left_menu_items = [
+            {'title': 'Notion', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Notion.app', 'icon': icon_path('notion.png')},
+            {'title': 'Dia', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Dia.app', 'icon': icon_path('dia.png')},
+            {'title': 'VS Code', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Visual Studio Code - Insiders.app', 'icon': icon_path('vscode.png')},
             {'title': 'Alfred', 'action': 'performAlfred:', 'target': self.actions, 'icon': icon_path('alfred.png')},
             {'title': 'Pastebot', 'action': 'performPastebot:', 'target': self.actions, 'icon': icon_path('pastebot.png')},
-            {'title': 'VS Code', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Visual Studio Code - Insiders.app', 'icon': icon_path('vscode.png')},
-            {'title': 'Dia', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Dia.app', 'icon': icon_path('dia.png')},
-            {'title': 'Notion', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Notion.app', 'icon': icon_path('notion.png')},
         ]
 
         # Define menu items for pie menu (frequently used)
@@ -79,12 +79,12 @@ class MenuUI(Cocoa.NSObject):
 
         # Define secondary menu items (less frequently used)
         secondary_items = [
-            {'title': 'Select All', 'action': 'performSelectAll:', 'target': self.actions, 'icon': icon_path('select-all.png')},
-            {'title': 'Select All & Copy', 'action': 'performSelectAllCopy:', 'target': self.actions, 'icon': icon_path('select-all-copy.png')},
-            {'title': 'Deselect', 'action': 'performDeselect:', 'target': self.actions, 'icon': icon_path('deselect.png')},
             {'title': 'PixelSnap', 'action': 'performPixelSnap:', 'target': self.actions, 'icon': icon_path('pixelsnap.png')},
             {'title': 'ColorSlurp', 'action': 'performColorSlurp:', 'target': self.actions, 'icon': icon_path('colorslurp.png')},
             {'title': 'Screenshot', 'action': 'performScreenCapture:', 'target': self.actions, 'icon': icon_path('screenshot.png')},
+            {'title': 'Select All', 'action': 'performSelectAll:', 'target': self.actions, 'icon': icon_path('select-all.png')},
+            {'title': 'Select All & Copy', 'action': 'performSelectAllCopy:', 'target': self.actions, 'icon': icon_path('select-all-copy.png')},
+            {'title': 'Deselect', 'action': 'performDeselect:', 'target': self.actions, 'icon': icon_path('deselect.png')},
             {'title': 'Restart Handy', 'action': 'performRestart:', 'target': self.actions, 'icon': icon_path('restart.png')},
         ]
 

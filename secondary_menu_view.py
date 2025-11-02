@@ -103,9 +103,9 @@ class SecondaryMenuView(Cocoa.NSView):
         start_x = (bounds.size.width - (num_columns * button_width + (num_columns - 1) * button_spacing)) / 2
         start_y = (bounds.size.height - total_grid_height) / 2
 
-        # Draw each button
+        # Draw each button (reversed rows so top of array = top row)
         for i, item in enumerate(self.menu_items):
-            row = i // num_columns
+            row = (num_rows - 1) - (i // num_columns)
             col = i % num_columns
 
             x_offset = start_x + col * (button_width + button_spacing)
@@ -295,9 +295,9 @@ class SecondaryMenuView(Cocoa.NSView):
         start_x = (bounds.size.width - (num_columns * button_width + (num_columns - 1) * button_spacing)) / 2
         start_y = (bounds.size.height - total_grid_height) / 2
 
-        # Check each button
+        # Check each button position (reversed rows to match rendering)
         for i in range(num_items):
-            row = i // num_columns
+            row = (num_rows - 1) - (i // num_columns)
             col = i % num_columns
 
             x_offset = start_x + col * (button_width + button_spacing)

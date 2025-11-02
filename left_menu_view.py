@@ -94,8 +94,8 @@ class LeftMenuView(Cocoa.NSView):
         # Center the buttons vertically
         start_y = (bounds.size.height - total_grid_height) / 2
 
-        # Draw each button vertically
-        for i, item in enumerate(self.menu_items):
+        # Draw each button vertically (reversed so top of array = top of menu)
+        for i, item in enumerate(reversed(self.menu_items)):
             y_offset = start_y + i * (button_height + button_spacing)
 
             button_rect = Cocoa.NSMakeRect(
@@ -113,7 +113,9 @@ class LeftMenuView(Cocoa.NSView):
             )
 
             # Fill color - highlight if hovered
-            if i == self.hovered_index:
+            # i is visual index (0 = top), convert to array index for comparison
+            array_index = num_items - 1 - i
+            if array_index == self.hovered_index:
                 Cocoa.NSColor.colorWithCalibratedRed_green_blue_alpha_(0.35, 0.35, 0.35, 0.9).setFill()
             else:
                 Cocoa.NSColor.colorWithCalibratedRed_green_blue_alpha_(0.25, 0.25, 0.25, 0.85).setFill()
@@ -235,7 +237,34 @@ class LeftMenuView(Cocoa.NSView):
 
     def updateHoveredIndex_(self, point):
         """Update which button is being hovered."""
-        new_index = self.getButtonIndexAtPoint_(point)
+        # Get the visual index (which button on screen)
+        bounds = self.bounds()
+        num_items = len(self.menu_items)
+
+        if num_items == 0:
+            new_index = -1
+        else:
+            # Calculate parameters
+            button_spacing = 4
+            vertical_button_padding = 6
+            icon_text_spacing = 4
+            icon_size = 30
+            text_height = 12
+            button_height = (vertical_button_padding * 2) + icon_size + icon_text_spacing + text_height
+            total_grid_height = (num_items * button_height) + ((num_items - 1) * button_spacing)
+            start_y = (bounds.size.height - total_grid_height) / 2
+            button_width = bounds.size.width
+
+            # Find which visual button (0 = top button on screen)
+            new_index = -1
+            for i in range(num_items):
+                y_offset = start_y + i * (button_height + button_spacing)
+                if (point.x >= 0 and point.x <= button_width and
+                    point.y >= y_offset and point.y <= y_offset + button_height):
+                    # Convert visual index to array index (reversed)
+                    new_index = num_items - 1 - i
+                    break
+
         if new_index != self.hovered_index:
             self.hovered_index = new_index
             self.setNeedsDisplay_(True)
@@ -273,13 +302,13 @@ class LeftMenuView(Cocoa.NSView):
         total_grid_height = (button_height * num_items) + (button_spacing * (num_items - 1))
         start_y = (bounds.size.height - total_grid_height) / 2
 
-        # Check each button
+        # Check each button (reversed to match rendering)
         for i in range(num_items):
             y_offset = start_y + i * (button_height + button_spacing)
 
             if (point.x >= 0 and point.x <= button_width and
                 point.y >= y_offset and point.y <= y_offset + button_height):
-                return i
+                return num_items - 1 - i
 
         return -1
 

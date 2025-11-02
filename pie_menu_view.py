@@ -85,10 +85,11 @@ class PieMenuView(Cocoa.NSView):
 
         # Number of slices
         num_items = len(self.menu_items)
-        angle_per_slice = 2 * math.pi / num_items        # Draw each pie slice
+        angle_per_slice = 2 * math.pi / num_items
+        # Draw each pie slice (start at 12 o'clock, go clockwise)
         for i, item in enumerate(self.menu_items):
-            start_angle = i * angle_per_slice - math.pi / 2
-            end_angle = start_angle + angle_per_slice
+            start_angle = -math.pi / 2 - i * angle_per_slice
+            end_angle = start_angle - angle_per_slice
 
             # Create pie slice path
             path = Cocoa.NSBezierPath.bezierPath()
@@ -98,7 +99,7 @@ class PieMenuView(Cocoa.NSView):
                 self.radius,
                 math.degrees(start_angle),
                 math.degrees(end_angle),
-                False
+                True
             )
             path.closePath()
 
@@ -116,7 +117,7 @@ class PieMenuView(Cocoa.NSView):
             path.stroke()
 
             # Calculate position for icon and text
-            mid_angle = start_angle + angle_per_slice / 2
+            mid_angle = start_angle - angle_per_slice / 2
             content_radius = self.radius * 0.75
             content_x = center_x + content_radius * math.cos(mid_angle)
             content_y = center_y + content_radius * math.sin(mid_angle)
@@ -305,17 +306,19 @@ class PieMenuView(Cocoa.NSView):
         if distance > self.radius or distance < self.center_radius / 2:
             return -1
 
-        # Calculate angle
-        angle = math.atan2(dy, dx) + math.pi / 2
-        if angle < 0:
-            angle += 2 * math.pi
+        # Calculate angle from center to point
+        angle = math.atan2(dy, dx)
+
+        # Our rendering starts at -pi/2 and goes clockwise (negative direction)
+        # So we need to: negate the angle, then offset by -pi/2
+        adjusted_angle = (-angle - math.pi / 2) % (2 * math.pi)
 
         # Determine which slice
         num_items = len(self.menu_items)
         angle_per_slice = 2 * math.pi / num_items
-        index = int(angle / angle_per_slice)
+        slice_index = int(adjusted_angle / angle_per_slice) % num_items
 
-        return index if index < num_items else -1
+        return slice_index if slice_index < num_items else -1
 
     def loadIcon_(self, icon_path):
         """
