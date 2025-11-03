@@ -53,11 +53,11 @@ class MenuUI(Cocoa.NSObject):
 
         # Define left menu items (app shortcuts)
         left_menu_items = [
+            {'title': 'Pastebot', 'action': 'performPastebot:', 'target': self.actions, 'icon': icon_path('pastebot.png')},
             {'title': 'Notion', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Notion.app', 'icon': icon_path('notion.png')},
             {'title': 'Dia', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Dia.app', 'icon': icon_path('dia.png')},
             {'title': 'VS Code', 'action': 'activateApp:', 'target': self.actions, 'app_path': '/Applications/Visual Studio Code - Insiders.app', 'icon': icon_path('vscode.png')},
             {'title': 'Alfred', 'action': 'performAlfred:', 'target': self.actions, 'icon': icon_path('alfred.png')},
-            {'title': 'Pastebot', 'action': 'performPastebot:', 'target': self.actions, 'icon': icon_path('pastebot.png')},
         ]
 
         # Define menu items for pie menu (frequently used)
